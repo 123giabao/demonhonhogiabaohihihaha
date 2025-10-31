@@ -9,142 +9,350 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #0f0;
-            padding: 20px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            padding: 0;
+            line-height: 1.6;
         }
         
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 24px;
+        }
         
         /* HEADER */
         header {
             text-align: center;
-            margin-bottom: 30px;
-            border: 2px solid #0f0;
-            padding: 20px;
-            background: rgba(0, 255, 0, 0.05);
+            margin-bottom: 48px;
+            padding: 32px;
+            background: linear-gradient(135deg, #2a0e1a 0%, #1a0a14 100%);
+            border-radius: 12px;
+            border: 1px solid #ff6b9d33;
         }
         
         h1 {
-            font-size: 32px;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px #0f0;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            color: #ff6b9d;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
         }
         
         .gif-container {
-            margin: 15px 0;
+            margin: 20px 0;
         }
         
         .gif-container img {
-            max-width: 200px;
-            border: 2px solid #0f0;
+            max-width: 180px;
+            border-radius: 8px;
+            border: 1px solid #ff6b9d55;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.2);
         }
         
-        .user-info { margin-top: 10px; font-size: 14px; }
-        .user-info a { color: #f00; text-decoration: none; }
+        .user-info { 
+            margin-top: 16px; 
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .user-info a { 
+            color: #ff4757;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .user-info a:hover {
+            color: #ff6b9d;
+        }
+        
+        /* SEARCH SECTION */
+        .search-section {
+            background: #151515;
+            padding: 32px;
+            border-radius: 16px;
+            border: 1px solid #ff6b9d33;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.08);
+        }
+        
+        .search-section h3 {
+            color: #ff6b9d;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
         
         /* INPUT */
         input[type="text"], textarea {
             width: 100%;
-            padding: 10px;
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
-            font-family: 'Courier New', monospace;
-            margin: 10px 0;
+            padding: 16px 20px;
+            background: #0a0a0a;
+            border: 2px solid #ff6b9d33;
+            border-radius: 12px;
+            color: #e5e5e5;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #ff6b9d;
+            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.15), 0 4px 16px rgba(255, 107, 157, 0.2);
+            background: #121212;
+        }
+        
+        input[type="text"]::placeholder, textarea::placeholder {
+            color: #666;
         }
         
         textarea {
-            height: 250px;
+            height: 280px;
             resize: vertical;
+            font-size: 13px;
+            line-height: 1.5;
         }
         
         /* BUTTON */
         button {
-            padding: 10px 20px;
-            background: #0f0;
-            color: #000;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff4757 100%);
+            color: #fff;
             border: none;
-            font-family: 'Courier New', monospace;
+            border-radius: 10px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            margin: 5px;
-            font-weight: bold;
+            margin: 8px 8px 8px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
         }
         
-        button:hover { background: #0c0; }
+        button:hover { 
+            background: linear-gradient(135deg, #ff8bb5 0%, #ff6b7a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
         
         /* RESULTS */
-        .result-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(0, 255, 0, 0.1);
-            border-left: 3px solid #0f0;
-            cursor: pointer;
+        #results {
+            margin-top: 16px;
         }
         
-        .result-item:hover { background: rgba(0, 255, 0, 0.2); }
+        .result-item {
+            padding: 14px 16px;
+            margin: 8px 0;
+            background: #151515;
+            border: 1px solid #ff6b9d33;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .result-item:hover { 
+            background: #1a1a1a;
+            border-color: #ff6b9d;
+            transform: translateX(6px);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.15);
+        }
         
         #problem-box {
             display: none;
-            border: 2px solid #0f0;
-            padding: 20px;
-            margin-top: 20px;
-            background: rgba(0, 255, 0, 0.02);
+            background: #151515;
+            border: 1px solid #ff6b9d33;
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 24px;
+        }
+        
+        #problem-title {
+            color: #ff6b9d;
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
         
         #problem-content {
-            background: #000;
-            padding: 15px;
-            border-left: 3px solid #0f0;
+            background: #0a0a0a;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 3px solid #ff6b9d;
             white-space: pre-wrap;
-            line-height: 1.6;
-            margin: 15px 0;
+            line-height: 1.7;
+            margin: 20px 0;
+            color: #e5e5e5;
+        }
+        
+        /* CODE EDITOR SECTION */
+        .code-editor-section {
+            margin-top: 32px;
+        }
+        
+        .code-editor-section h4 {
+            color: #ff6b9d;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .language-selector {
+            margin: 16px 0 20px 0;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .language-selector label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: #0a0a0a;
+            border: 1px solid #ff6b9d33;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .language-selector label:hover {
+            border-color: #ff6b9d;
+        }
+        
+        .language-selector input[type="radio"] {
+            cursor: pointer;
+            accent-color: #ff6b9d;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .button-group button:nth-child(2) {
+            background: linear-gradient(135deg, #c56cf0 0%, #a855f7 100%);
+        }
+        
+        .button-group button:nth-child(2):hover {
+            background: linear-gradient(135deg, #d88fff 0%, #c084fc 100%);
         }
         
         /* HINTS */
-        .hint-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255, 255, 0, 0.1);
-            border: 1px solid #ff0;
-            cursor: pointer;
+        #hints-container {
+            margin: 24px 0;
         }
         
-        .hint-title { color: #ff0; }
+        #hints-container h4 {
+            color: #ffa502;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .hint-item {
+            margin: 10px 0;
+            padding: 14px 16px;
+            background: #1a1a1a;
+            border: 1px solid #ffa50233;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .hint-item:hover {
+            border-color: #ffa502;
+        }
+        
+        .hint-title { 
+            color: #ffa502;
+            font-weight: 500;
+        }
+        
         .hint-content {
             display: none;
-            margin-top: 10px;
-            color: #0f0;
-            padding-left: 15px;
+            margin-top: 12px;
+            color: #999;
+            padding-left: 16px;
+            border-left: 2px solid #ffa502;
         }
         
         /* RESULT BOX */
         #result-box {
             display: none;
-            margin-top: 20px;
-            padding: 20px;
-            border: 2px solid #0f0;
+            margin-top: 24px;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #ff6b9d33;
         }
         
-        #result-box.success { border-color: #0f0; background: rgba(0, 255, 0, 0.1); }
-        #result-box.error { border-color: #f00; background: rgba(255, 0, 0, 0.1); }
+        #result-box.success { 
+            border-color: #26de81;
+            background: rgba(38, 222, 129, 0.1);
+        }
+        
+        #result-box.error { 
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.1);
+        }
+        
+        #result-box h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        #result-box pre {
+            white-space: pre-wrap;
+            line-height: 1.7;
+            color: #e5e5e5;
+        }
         
         /* SPINNER */
         .spinner {
             display: none;
             width: 40px;
             height: 40px;
-            border: 4px solid rgba(0, 255, 0, 0.2);
-            border-top: 4px solid #0f0;
+            border: 3px solid rgba(255, 107, 157, 0.2);
+            border-top: 3px solid #ff6b9d;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+            animation: spin 0.8s linear infinite;
+            margin: 24px auto;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* VISUALIZATION BOX */
+        #visualization-box {
+            display: none;
+            margin-top: 24px;
+            background: #0a0a0a;
+            border: 1px solid #ff6b9d33;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        #visualization-box h3 {
+            color: #ff6b9d;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        #mermaid-diagram {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
         }
         
         /* MODAL */
@@ -155,70 +363,114 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.92);
             z-index: 1000;
             overflow-y: auto;
         }
         
         .modal-content {
-            background: #000;
-            border: 3px solid #0f0;
-            max-width: 800px;
+            background: #0a0a0a;
+            border: 1px solid #ff6b9d33;
+            border-radius: 16px;
+            max-width: 900px;
             margin: 50px auto;
-            padding: 30px;
+            padding: 40px;
         }
         
         .close-modal {
             float: right;
-            font-size: 30px;
-            color: #f00;
+            font-size: 32px;
+            color: #ff4757;
             cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        
+        .close-modal:hover {
+            color: #ff6b9d;
         }
         
         /* ANALYTICS BUTTON */
         #analytics-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            background: #f0f;
-            color: #000;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #c56cf0 0%, #a855f7 100%);
+            color: #fff;
             border: none;
-            font-family: 'Courier New', monospace;
+            border-radius: 12px;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
             z-index: 999;
+            box-shadow: 0 4px 12px rgba(197, 108, 240, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #analytics-btn:hover {
+            background: linear-gradient(135deg, #d88fff 0%, #c084fc 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(197, 108, 240, 0.5);
         }
         
         .student-list-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(0, 255, 0, 0.1);
-            border-left: 3px solid #0f0;
+            padding: 14px 16px;
+            margin: 8px 0;
+            background: #151515;
+            border: 1px solid #ff6b9d33;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .student-list-item:hover { background: rgba(0, 255, 0, 0.2); }
+        .student-list-item:hover { 
+            background: #1a1a1a;
+            border-color: #ff6b9d;
+            transform: translateX(6px);
+        }
         
         .stat-card {
-            background: rgba(0, 255, 0, 0.05);
-            border: 1px solid #0f0;
-            padding: 15px;
-            margin: 10px 0;
+            background: #151515;
+            border: 1px solid #ff6b9d33;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+        
+        .stat-card h3 {
+            color: #ff6b9d;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
         }
         
         .strength-item {
-            background: rgba(0, 255, 0, 0.2);
-            padding: 8px;
-            margin: 5px 0;
-            border-left: 3px solid #0f0;
+            background: rgba(38, 222, 129, 0.1);
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #26de81;
         }
         
         .weakness-item {
-            background: rgba(255, 0, 0, 0.2);
-            padding: 8px;
-            margin: 5px 0;
-            border-left: 3px solid #f00;
+            background: rgba(255, 71, 87, 0.1);
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 3px solid #ff4757;
+        }
+        
+        #analysis-result {
+            margin-top: 32px;
+        }
+        
+        #analysis-result h2 {
+            color: #c56cf0;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
         }
     </style>
     
@@ -239,14 +491,14 @@
             resultDiv.innerHTML = "";
             
             if (results.length === 0) {
-                resultDiv.innerHTML = "<p style='color: #f00;'>>> KHÔNG TÌM THẤY</p>";
+                resultDiv.innerHTML = "<p style='color: #ff4757;'>→ Không tìm thấy kết quả</p>";
                 return;
             }
 
             results.forEach(r => {
                 const item = document.createElement("div");
                 item.classList.add("result-item");
-                item.textContent = ">> " + r.title;
+                item.textContent = "→ " + r.title;
                 item.onclick = () => loadProblem(r.title);
                 resultDiv.appendChild(item);
             });
@@ -264,14 +516,14 @@
                 return;
             }
 
-            document.getElementById("problem-title").textContent = ">>> " + problem.title;
+            document.getElementById("problem-title").textContent = problem.title;
             document.getElementById("problem-content").textContent = problem.content;
             
             const hintsDiv = document.getElementById("hints-container");
             hintsDiv.innerHTML = "";
             
             if (problem.hint1 || problem.hint2 || problem.hint3) {
-                hintsDiv.innerHTML = "<h4 style='color: #ff0;'>💡 GỢI Ý</h4>";
+                hintsDiv.innerHTML = "<h4>💡 Gợi ý</h4>";
                 
                 function formatHint(hintText) {
                     return hintText.replace(/\n/g, '<br>');
@@ -280,7 +532,7 @@
                 if (problem.hint1) {
                     hintsDiv.innerHTML += `
                         <div class="hint-item" onclick="toggleHint('hint1')">
-                            <div class="hint-title">🔒 Gợi ý 1 (Click)</div>
+                            <div class="hint-title">🔒 Gợi ý 1 (Click để xem)</div>
                             <div class="hint-content" id="hint1-content">${formatHint(problem.hint1)}</div>
                         </div>
                     `;
@@ -288,7 +540,7 @@
                 if (problem.hint2) {
                     hintsDiv.innerHTML += `
                         <div class="hint-item" onclick="toggleHint('hint2')">
-                            <div class="hint-title">🔒 Gợi ý 2 (Click)</div>
+                            <div class="hint-title">🔒 Gợi ý 2 (Click để xem)</div>
                             <div class="hint-content" id="hint2-content">${formatHint(problem.hint2)}</div>
                         </div>
                     `;
@@ -296,7 +548,7 @@
                 if (problem.hint3) {
                     hintsDiv.innerHTML += `
                         <div class="hint-item" onclick="toggleHint('hint3')">
-                            <div class="hint-title">🔒 Gợi ý 3 (Click)</div>
+                            <div class="hint-title">🔒 Gợi ý 3 (Click để xem)</div>
                             <div class="hint-content" id="hint3-content">${formatHint(problem.hint3)}</div>
                         </div>
                     `;
@@ -306,6 +558,7 @@
             document.getElementById("problem-box").style.display = "block";
             document.getElementById("results").innerHTML = "";
             document.getElementById("result-box").style.display = "none";
+            document.getElementById("visualization-box").style.display = "none";
         }
 
         function toggleHint(hintId) {
@@ -327,8 +580,8 @@
                     resultBox.className = result.score >= 70 ? "success" : "error";
                     
                     resultBox.innerHTML = `
-                        <h3>${result.score >= 70 ? '✅ PASS' : '❌ FAIL'} - Điểm: ${result.score}/100</h3>
-                        <pre style="white-space: pre-wrap; line-height: 1.6;">${result.feedback}</pre>
+                        <h3>${result.score >= 70 ? '✅ Đạt' : '❌ Chưa đạt'} - Điểm: ${result.score}/100</h3>
+                        <pre>${result.feedback}</pre>
                     `;
                 }
             } catch (error) {
@@ -337,12 +590,12 @@
         }
 
         async function submitCode() {
-            const title = document.getElementById("problem-title").textContent.replace(">>> ", "");
+            const title = document.getElementById("problem-title").textContent;
             const code = document.getElementById("code").value;
             const language = document.querySelector('input[name="language"]:checked').value;
 
             if (!code.trim()) {
-                alert("⚠️ NHẬP CODE TRƯỚC!");
+                alert("⚠️ Vui lòng nhập code trước khi gửi!");
                 return;
             }
 
@@ -351,7 +604,7 @@
             spinner.style.display = "block";
             resultBox.style.display = "block";
             resultBox.className = "";
-            resultBox.innerHTML = "<h3>⏳ AI ĐANG CHẤM...</h3>";
+            resultBox.innerHTML = "<h3>⏳ AI đang chấm bài...</h3>";
 
             const formData = new FormData();
             formData.append("title", title);
@@ -375,7 +628,7 @@
             } catch (error) {
                 spinner.style.display = "none";
                 resultBox.className = "error";
-                resultBox.innerHTML = `<h3>❌ LỖI: ${error.message}</h3>`;
+                resultBox.innerHTML = `<h3>❌ Lỗi: ${error.message}</h3>`;
             }
         }
 
@@ -384,7 +637,7 @@
             const language = document.querySelector('input[name="language"]:checked').value;
 
             if (!code.trim()) {
-                alert("⚠️ NHẬP CODE TRƯỚC!");
+                alert("⚠️ Vui lòng nhập code trước!");
                 return;
             }
 
@@ -413,10 +666,10 @@
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await mermaid.run({ nodes: [document.getElementById(uniqueId)] });
                 } else {
-                    diagramDiv.innerHTML = `<p style="color: #f00;">❌ ${result.error}</p>`;
+                    diagramDiv.innerHTML = `<p style="color: #ff4757;">❌ ${result.error}</p>`;
                 }
             } catch (error) {
-                diagramDiv.innerHTML = `<p style="color: #f00;">❌ ${error.message}</p>`;
+                diagramDiv.innerHTML = `<p style="color: #ff4757;">❌ ${error.message}</p>`;
             }
         }
         
@@ -440,7 +693,7 @@
                 data.students.forEach(student => {
                     const item = document.createElement('div');
                     item.className = 'student-list-item';
-                    item.textContent = `>> ${student.name} [${student.username}]`;
+                    item.textContent = `→ ${student.name} [${student.username}]`;
                     item.onclick = () => analyzeStudent(student.username, student.name);
                     listDiv.appendChild(item);
                 });
@@ -450,7 +703,7 @@
         async function analyzeStudent(username, name) {
             const resultDiv = document.getElementById('analysis-result');
             resultDiv.style.display = 'block';
-            resultDiv.innerHTML = '<p style="color: #ff0;">⏳ AI ĐANG PHÂN TÍCH...</p>';
+            resultDiv.innerHTML = '<p style="color: #ffa502;">⏳ AI đang phân tích...</p>';
             
             const formData = new FormData();
             formData.append('username', username);
@@ -462,10 +715,10 @@
                 if (result.success) {
                     displayAnalysis(result.data, name);
                 } else {
-                    resultDiv.innerHTML = `<p style="color: #f00;">❌ ${result.error}</p>`;
+                    resultDiv.innerHTML = `<p style="color: #ff4757;">❌ ${result.error}</p>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<p style="color: #f00;">❌ ${error.message}</p>`;
+                resultDiv.innerHTML = `<p style="color: #ff4757;">❌ ${error.message}</p>`;
             }
         }
         
@@ -473,9 +726,9 @@
             const resultDiv = document.getElementById('analysis-result');
             
             let html = `
-                <h2 style="color: #f0f;">🦠 PHÂN TÍCH: ${name}</h2>
+                <h2>🦠 Phân tích: ${name}</h2>
                 <div class="stat-card">
-                    <h3>📊 TỔNG QUAN</h3>
+                    <h3>📊 Tổng quan</h3>
                     <p>Tổng bài: ${data.total_submissions || 0}</p>
                     <p>Xu hướng: ${data.learning_trend || 'N/A'}</p>
                     <p>Điểm TB: ${data.overall_score || 'N/A'}/100</p>
@@ -485,7 +738,7 @@
             if (data.strengths && data.strengths.length > 0) {
                 html += `
                     <div class="stat-card">
-                        <h3>💪 ĐIỂM MẠNH</h3>
+                        <h3>💪 Điểm mạnh</h3>
                         ${data.strengths.map(s => `<div class="strength-item">✅ ${s}</div>`).join('')}
                     </div>
                 `;
@@ -494,7 +747,7 @@
             if (data.weaknesses && data.weaknesses.length > 0) {
                 html += `
                     <div class="stat-card">
-                        <h3>⚠️ CẦN CẢI THIỆN</h3>
+                        <h3>⚠️ Cần cải thiện</h3>
                         ${data.weaknesses.map(w => `<div class="weakness-item">❌ ${w}</div>`).join('')}
                     </div>
                 `;
@@ -503,7 +756,7 @@
             if (data.recommendations && data.recommendations.length > 0) {
                 html += `
                     <div class="stat-card">
-                        <h3>💡 KHUYẾN NGHỊ</h3>
+                        <h3>💡 Khuyến nghị</h3>
                         ${data.recommendations.map((r, i) => `<p>${i+1}. ${r}</p>`).join('')}
                     </div>
                 `;
@@ -512,7 +765,7 @@
             if (data.summary) {
                 html += `
                     <div class="stat-card">
-                        <h3>📝 TÓM TẮT</h3>
+                        <h3>📝 Tóm tắt</h3>
                         <p>${data.summary}</p>
                     </div>
                 `;
@@ -525,7 +778,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>🦠 hãy suy nghĩ như 1 chuyên gia</h1>
+            <h1>🦠 Hãy suy nghĩ như 1 chuyên gia</h1>
             <div class="gif-container">
                 <img src="{{ random_gif }}" alt="Coding GIF">
             </div>
@@ -534,9 +787,11 @@
             </div>
         </header>
 
-        <h3>🔎 Tìm đề bài</h3>
-        <input id="query" placeholder="Nhập tên đề..." oninput="searchProblems()">
-        <div id="results"></div>
+        <div class="search-section">
+            <h3>🔎 Tìm đề bài</h3>
+            <input id="query" placeholder="Nhập tên đề bài để tìm kiếm..." oninput="searchProblems()">
+            <div id="results"></div>
+        </div>
 
         <div id="problem-box">
             <h3 id="problem-title"></h3>
@@ -544,36 +799,46 @@
             
             <div id="hints-container"></div>
             
-            <h4>💻 Nhập code:</h4>
-            <textarea id="code" placeholder="Code tại đây..."></textarea>
+            <div class="code-editor-section">
+                <h4>💻 Nhập code của bạn</h4>
+                <textarea id="code" placeholder="Viết code tại đây..."></textarea>
 
-            <label><input type="radio" name="language" value="Python" checked> Python</label>
-            <label><input type="radio" name="language" value="C++"> C++</label><br><br>
+                <div class="language-selector">
+                    <label>
+                        <input type="radio" name="language" value="Python" checked>
+                        <span>Python</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="language" value="C++">
+                        <span>C++</span>
+                    </label>
+                </div>
 
-            <button onclick="submitCode()">GỬI BÀI</button>
-            <button onclick="visualizeCode()">XEM SƠ ĐỒ</button>
+                <div class="button-group">
+                    <button onclick="submitCode()">Gửi bài</button>
+                    <button onclick="visualizeCode()">Xem sơ đồ</button>
+                </div>
+            </div>
             
             <div id="loading-spinner" class="spinner"></div>
             <div id="result-box"></div>
             
-            <div id="visualization-box" style="display: none; margin-top: 20px; border: 2px solid #0f0; padding: 15px;">
-                <h3>🧠 SƠ ĐỒ</h3>
+            <div id="visualization-box">
+                <h3>🧠 Sơ đồ code</h3>
                 <div id="mermaid-diagram"></div>
             </div>
         </div>
     </div>
     
-    <button id="analytics-btn" onclick="openAnalytics()">📊 PHÂN TÍCH</button>
+    <button id="analytics-btn" onclick="openAnalytics()">📊 Phân tích</button>
     
     <div id="analytics-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeAnalytics()">&times;</span>
-            <h2>📊 PHÂN TÍCH HỌC SINH</h2>
+            <h2 style="color: #c56cf0; font-size: 24px; font-weight: 600; margin-bottom: 24px;">📊 Phân tích học sinh</h2>
             <div id="student-list"></div>
             <div id="analysis-result"></div>
         </div>
     </div>
 </body>
-
 </html>
-
