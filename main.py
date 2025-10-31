@@ -1,90 +1,57 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import gspread
-from google.oauth2.service_account import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 import uuid
 import time
 import re
 import json
 from openai import OpenAI
-import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'secret123')
+app.secret_key = "secret123"
 
 # 🔑 DeepSeek API Configuration
-DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-474836e4c7b6462d8a9a24ed964b0251')
+DEEPSEEK_API_KEY = "sk-474836e4c7b6462d8a9a24ed964b0251"
 deepseek_client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
     base_url="https://api.deepseek.com"
 )
 
 # 🔑 Kết nối Google Sheets
-SCOPES = [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
-]
-
-try:
-
-    creds_json = os.environ.get('GOOGLE_CREDENTIALS_JSON')
-    
-    if creds_json:
-        creds_dict = json.loads(creds_json)
-        creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-    else:
-        creds = Credentials.from_service_account_file(
-            "credentials.json",
-            scopes=SCOPES
-        )
-    
-    client = gspread.authorize(creds)
-    print("✅ Kết nối Google Sheets thành công!")
-except Exception as e:
-    print(f"❌ Lỗi kết nối Google Sheets: {str(e)}")
-    client = None
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+creds = ServiceAccountCredentials.from_json_keyfile_name(
+    "./credentials.json", 
+    scope
+)
+client = gspread.authorize(creds)
 
 # 📄 Mở sheets
-try:
-    sheet_users = client.open_by_key("1MN8N3lV1Z_ijA8y8aHseHjFxBntPngOnZQ9vQ9EcGsk").sheet1
-    sheet_problems = client.open_by_key("1fiqngxE_wiskJ19WJz1R43Hvu8UqaqWCp3wgMoe5rP4").sheet1
-except Exception as e:
-    print(f"❌ Lỗi mở sheets: {str(e)}")
-    sheet_users = None
-    sheet_problems = None
+sheet_users = client.open_by_key("1MN8N3lV1Z_ijA8y8aHseHjFxBntPngOnZQ9vQ9EcGsk").sheet1
+sheet_problems = client.open_by_key("1fiqngxE_wiskJ19WJz1R43Hvu8UqaqWCp3wgMoe5rP4").sheet1
 
-# Sheet submissions
+# Sheet submissions - Tạo nếu chưa có
 try:
     sheet_submissions = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA").worksheet("Submissions")
 except:
-    try:
-        spreadsheet = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA")
-        sheet_submissions = spreadsheet.add_worksheet(title="Submissions", rows="1000", cols="10")
-        sheet_submissions.append_row([
-            "Username", "Problem", "Language", "Code", "Score", "Result", 
-            "Feedback", "Timestamp", "Strengths", "Weaknesses"
-        ])
-    except:
-        sheet_submissions = None
-
-# 🆕 Sheet lịch sử học tập
-try:
     spreadsheet = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA")
-    sheet_lichsu = spreadsheet.worksheet("LichSuHocTap")
-    print("✅ Đã kết nối Sheet LichSuHocTap")
+    sheet_submissions = spreadsheet.add_worksheet(title="Submissions", rows="1000", cols="10")
+    sheet_submissions.append_row([
+        "Username", "Problem", "Language", "Code", "Score", "Result", 
+        "Feedback", "Timestamp", "Strengths", "Weaknesses"
+    ])
+
+# 🆕 Sheet lịch sử học tập (Sheet thứ 3)
+try:
+    sheet_lichsu = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA").worksheet("LichSuHocTap")
 except:
-    try:
-        spreadsheet = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA")
-        sheet_lichsu = spreadsheet.add_worksheet(title="LichSuHocTap", rows="1000", cols="20")
-        sheet_lichsu.append_row([
-            "Username", "TotalSubmissions", "AverageScore", "LastUpdated",
-            "RecentCodes", "RecentProblems", "RecentScores", "RecentFeedbacks",
-            "OverallStrengths", "OverallWeaknesses", "LearningTrend",
-            "ThinkingStyle", "FocusAreas", "LastAnalysis"
-        ])
-        print("✅ Đã tạo Sheet LichSuHocTap mới")
-    except Exception as e:
-        print(f"❌ Lỗi tạo Sheet LichSuHocTap: {str(e)}")
-        sheet_lichsu = None
+    spreadsheet = client.open_by_key("10DpZvCkKwNuKGkgHxDGbLrA1apRlaIGpOEhaxWmi-LA")
+    sheet_lichsu = spreadsheet.add_worksheet(title="LichSuHocTap", rows="1000", cols="20")
+    sheet_lichsu.append_row([
+        "Username", "TotalSubmissions", "AverageScore", "LastUpdated",
+        "RecentCodes", "RecentProblems", "RecentScores", "RecentFeedbacks",
+        "OverallStrengths", "OverallWeaknesses", "LearningTrend",
+        "ThinkingStyle", "FocusAreas", "LastAnalysis"
+    ])
 
 # Lưu trữ tạm kết quả submission
 submission_results = {}
@@ -114,42 +81,36 @@ def get_correct_answer(problem_title):
 
 def save_to_lichsu(username, submission_data):
     """Lưu lịch sử vào Sheet LichSuHocTap"""
-    if sheet_lichsu is None:
-        print("❌ Sheet LichSuHocTap không khả dụng")
-        return False
-    
     try:
+        # Lấy dữ liệu hiện tại
         all_data = sheet_lichsu.get_all_values()
         user_row_idx = None
         
+        # Tìm hàng của user
         for idx, row in enumerate(all_data[1:], start=2):
-            if len(row) > 0 and row[0] == username:
+            if row[0] == username:
                 user_row_idx = idx
                 break
         
+        # Lấy submissions gần đây của user
         recent_submissions = []
         submissions_data = sheet_submissions.get_all_values()
         for row in submissions_data[1:]:
-            if len(row) > 0 and row[0] == username:
+            if row[0] == username:
                 recent_submissions.append({
-                    'problem': row[1] if len(row) > 1 else '',
-                    'code': row[3][:200] if len(row) > 3 else '',
-                    'score': row[4] if len(row) > 4 else '0',
-                    'feedback': row[6][:100] if len(row) > 6 else ''
+                    'problem': row[1],
+                    'code': row[3][:200],  # Lưu 200 ký tự đầu
+                    'score': row[4],
+                    'feedback': row[6][:100]
                 })
         
-        if not recent_submissions:
-            print(f"⚠️ {username} chưa có submission nào")
-            return False
-        
+        # Lấy 10 bài gần nhất
         recent_submissions = recent_submissions[-10:]
         
-        try:
-            scores = [float(s['score']) for s in recent_submissions if s['score']]
-            avg_score = sum(scores) / len(scores) if scores else 0
-        except:
-            avg_score = 0
+        # Tính điểm trung bình
+        avg_score = sum([float(s['score']) for s in recent_submissions]) / len(recent_submissions) if recent_submissions else 0
         
+        # Chuẩn bị dữ liệu
         recent_codes = " ||| ".join([s['code'] for s in recent_submissions])
         recent_problems = " ||| ".join([s['problem'] for s in recent_submissions])
         recent_scores = ", ".join([str(s['score']) for s in recent_submissions])
@@ -157,23 +118,29 @@ def save_to_lichsu(username, submission_data):
         
         new_data = [
             username,
-            str(len(recent_submissions)),
-            str(round(avg_score, 2)),
+            len(recent_submissions),
+            round(avg_score, 2),
             time.strftime('%Y-%m-%d %H:%M:%S'),
             recent_codes,
             recent_problems,
             recent_scores,
             recent_feedbacks,
-            "", "", "", "", "", ""
+            "",  # OverallStrengths - sẽ được điền khi phân tích
+            "",  # OverallWeaknesses
+            "",  # LearningTrend
+            "",  # ThinkingStyle
+            "",  # FocusAreas
+            ""   # LastAnalysis
         ]
         
         if user_row_idx:
+            # Update existing row
             sheet_lichsu.update(f'A{user_row_idx}:N{user_row_idx}', [new_data])
-            print(f"✅ Đã cập nhật lịch sử cho {username}")
         else:
+            # Append new row
             sheet_lichsu.append_row(new_data)
-            print(f"✅ Đã thêm lịch sử mới cho {username}")
         
+        print(f"✅ Đã lưu lịch sử cho {username}")
         return True
     except Exception as e:
         print(f"❌ Lỗi lưu lịch sử: {str(e)}")
@@ -194,6 +161,7 @@ def update_analysis_to_lichsu(username, analysis_result):
         if not user_row_idx:
             return False
         
+        # Cập nhật các cột phân tích
         sheet_lichsu.update(f'I{user_row_idx}', [[", ".join(analysis_result.get('strengths', []))]])
         sheet_lichsu.update(f'J{user_row_idx}', [[", ".join(analysis_result.get('weaknesses', []))]])
         sheet_lichsu.update(f'K{user_row_idx}', [[analysis_result.get('learning_trend', '')]])
@@ -253,6 +221,7 @@ Chấm điểm dựa trên:
         
         result_text = response.choices[0].message.content.strip()
         
+        # Parse JSON từ response
         if "```json" in result_text:
             result_text = result_text.split("```json")[1].split("```")[0].strip()
         elif "```" in result_text:
@@ -286,6 +255,7 @@ Chấm điểm dựa trên:
 def analyze_student_history_with_deepseek(username):
     """Phân tích toàn bộ lịch sử học tập của học sinh bằng DeepSeek"""
     try:
+        # Lấy dữ liệu từ Sheet LichSuHocTap
         all_data = sheet_lichsu.get_all_values()
         user_data = None
         
@@ -294,16 +264,18 @@ def analyze_student_history_with_deepseek(username):
                 user_data = row
                 break
         
-        if not user_data or not user_data[4]:
+        if not user_data or not user_data[4]:  # Kiểm tra có code không
             return {
                 "error": "Học sinh chưa có bài làm nào",
                 "total_submissions": 0
             }
         
+        # Parse dữ liệu
         recent_problems = user_data[5].split(" ||| ") if len(user_data) > 5 else []
         recent_scores = user_data[6].split(", ") if len(user_data) > 6 else []
         recent_feedbacks = user_data[7].split(" ||| ") if len(user_data) > 7 else []
         
+        # Tạo summary
         submission_summary = "\n\n".join([
             f"""Bài {i+1}: {recent_problems[i] if i < len(recent_problems) else 'N/A'}
 Điểm: {recent_scores[i] if i < len(recent_scores) else 'N/A'}
@@ -349,6 +321,7 @@ Phân tích sâu:
         
         result_text = response.choices[0].message.content.strip()
         
+        # Parse JSON
         if "```json" in result_text:
             result_text = result_text.split("```json")[1].split("```")[0].strip()
         elif "```" in result_text:
@@ -358,6 +331,7 @@ Phân tích sâu:
         result['total_submissions'] = int(user_data[1]) if user_data[1] else 0
         result['recent_scores'] = recent_scores[:5]
         
+        # Lưu kết quả phân tích vào Sheet
         update_analysis_to_lichsu(username, result)
         
         return result
@@ -392,6 +366,7 @@ def index():
     if 'user' not in session:
         return redirect(url_for('login'))
     
+    # Random GIF
     import random
     random_gif = random.choice(RANDOM_GIFS)
     
@@ -445,6 +420,7 @@ def submit_code():
 
     submission_id = str(uuid.uuid4())
     
+    # Lưu trạng thái processing
     submission_results[submission_id] = {
         'status': 'processing',
         'username': username,
@@ -455,6 +431,7 @@ def submit_code():
     }
 
     try:
+        # Lấy đáp án từ Google Sheets
         correct_answer = get_correct_answer(title)
         
         if not correct_answer:
@@ -463,8 +440,10 @@ def submit_code():
                 'message': '❌ Không tìm thấy đáp án cho bài này'
             })
         
+        # Chấm bài bằng DeepSeek
         result = grade_code_with_deepseek(code, correct_answer, title, language)
         
+        # Lưu kết quả vào memory
         submission_results[submission_id] = {
             'status': 'completed',
             'result': result['result'],
@@ -476,6 +455,7 @@ def submit_code():
             'timestamp': time.time()
         }
         
+        # Lưu vào Google Sheets
         try:
             sheet_submissions.append_row([
                 username,
@@ -491,6 +471,7 @@ def submit_code():
             ])
             print(f"✅ Đã lưu submission {submission_id} vào Google Sheets")
             
+            # 🆕 Lưu vào Sheet LichSuHocTap
             save_to_lichsu(username, {
                 'problem': title,
                 'code': code,
@@ -629,6 +610,7 @@ def analyze_student():
     try:
         username = request.form.get('username')
         
+        # Phân tích bằng DeepSeek
         result = analyze_student_history_with_deepseek(username)
         
         if 'error' in result:
@@ -652,4 +634,5 @@ def logout():
     return redirect(url_for('login'))
 
 
-app = app
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
