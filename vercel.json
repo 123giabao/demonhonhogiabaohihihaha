@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "env": {
+    "SECRET_KEY": "secret123",
+    "DEEPSEEK_API_KEY": "sk-474836e4c7b6462d8a9a24ed964b0251"
+  }
+}

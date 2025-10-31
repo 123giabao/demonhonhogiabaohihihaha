@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error { color: red; text-align: center; }
+    </style>
+</head>
+<body>
+    <form method="POST">
+        <h2>Đăng nhập hệ thống</h2>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+        <input type="text" name="username" placeholder="Tên học sinh" required>
+        <input type="password" name="password" placeholder="Mật khẩu" required>
+        <button type="submit">Đăng nhập</button>
+    </form>
+</body>
+</html>

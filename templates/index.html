@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>🦠 CODE GRADER</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* HEADER */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #0f0;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        
+        h1 {
+            font-size: 32px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .gif-container {
+            margin: 15px 0;
+        }
+        
+        .gif-container img {
+            max-width: 200px;
+            border: 2px solid #0f0;
+        }
+        
+        .user-info { margin-top: 10px; font-size: 14px; }
+        .user-info a { color: #f00; text-decoration: none; }
+        
+        /* INPUT */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        textarea {
+            height: 250px;
+            resize: vertical;
+        }
+        
+        /* BUTTON */
+        button {
+            padding: 10px 20px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        
+        button:hover { background: #0c0; }
+        
+        /* RESULTS */
+        .result-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #0f0;
+            cursor: pointer;
+        }
+        
+        .result-item:hover { background: rgba(0, 255, 0, 0.2); }
+        
+        #problem-box {
+            display: none;
+            border: 2px solid #0f0;
+            padding: 20px;
+            margin-top: 20px;
+            background: rgba(0, 255, 0, 0.02);
+        }
+        
+        #problem-content {
+            background: #000;
+            padding: 15px;
+            border-left: 3px solid #0f0;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        /* HINTS */
+        .hint-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 0, 0.1);
+            border: 1px solid #ff0;
+            cursor: pointer;
+        }
+        
+        .hint-title { color: #ff0; }
+        .hint-content {
+            display: none;
+            margin-top: 10px;
+            color: #0f0;
+            padding-left: 15px;
+        }
+        
+        /* RESULT BOX */
+        #result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px solid #0f0;
+        }
+        
+        #result-box.success { border-color: #0f0; background: rgba(0, 255, 0, 0.1); }
+        #result-box.error { border-color: #f00; background: rgba(255, 0, 0, 0.1); }
+        
+        /* SPINNER */
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 255, 0, 0.2);
+            border-top: 4px solid #0f0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* MODAL */
+        #analytics-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: #000;
+            border: 3px solid #0f0;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+        }
+        
+        .close-modal {
+            float: right;
+            font-size: 30px;
+            color: #f00;
+            cursor: pointer;
+        }
+        
+        /* ANALYTICS BUTTON */
+        #analytics-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #f0f;
+            color: #000;
+            border: none;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 999;
+        }
+        
+        .student-list-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(0, 255, 0, 0.1);
+            border-left: 3px solid #0f0;
+            cursor: pointer;
+        }
+        
+        .student-list-item:hover { background: rgba(0, 255, 0, 0.2); }
+        
+        .stat-card {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid #0f0;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .strength-item {
+            background: rgba(0, 255, 0, 0.2);
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 3px solid #0f0;
+        }
+        
+        .weakness-item {
+            background: rgba(255, 0, 0, 0.2);
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 3px solid #f00;
+        }
+    </style>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        let currentSubmissionId = null;
+        let pollingInterval = null;
+
+        async function searchProblems() {
+            const query = document.getElementById("query").value;
+            const formData = new FormData();
+            formData.append("query", query);
+
+            const response = await fetch("/search", { method: "POST", body: formData });
+            const results = await response.json();
+
+            const resultDiv = document.getElementById("results");
+            resultDiv.innerHTML = "";
+            
+            if (results.length === 0) {
+                resultDiv.innerHTML = "<p style='color: #f00;'>>> KHÔNG TÌM THẤY</p>";
+                return;
+            }
+
+            results.forEach(r => {
+                const item = document.createElement("div");
+                item.classList.add("result-item");
+                item.textContent = ">> " + r.title;
+                item.onclick = () => loadProblem(r.title);
+                resultDiv.appendChild(item);
+            });
+        }
+
+        async function loadProblem(title) {
+            const formData = new FormData();
+            formData.append("title", title);
+
+            const response = await fetch("/get_problem", { method: "POST", body: formData });
+            const problem = await response.json();
+
+            if (problem.error) {
+                alert("❌ " + problem.error);
+                return;
+            }
+
+            document.getElementById("problem-title").textContent = ">>> " + problem.title;
+            document.getElementById("problem-content").textContent = problem.content;
+            
+            const hintsDiv = document.getElementById("hints-container");
+            hintsDiv.innerHTML = "";
+            
+            if (problem.hint1 || problem.hint2 || problem.hint3) {
+                hintsDiv.innerHTML = "<h4 style='color: #ff0;'>💡 GỢI Ý</h4>";
+                
+                function formatHint(hintText) {
+                    return hintText.replace(/\n/g, '<br>');
+                }
+                
+                if (problem.hint1) {
+                    hintsDiv.innerHTML += `
+                        <div class="hint-item" onclick="toggleHint('hint1')">
+                            <div class="hint-title">🔒 Gợi ý 1 (Click)</div>
+                            <div class="hint-content" id="hint1-content">${formatHint(problem.hint1)}</div>
+                        </div>
+                    `;
+                }
+                if (problem.hint2) {
+                    hintsDiv.innerHTML += `
+                        <div class="hint-item" onclick="toggleHint('hint2')">
+                            <div class="hint-title">🔒 Gợi ý 2 (Click)</div>
+                            <div class="hint-content" id="hint2-content">${formatHint(problem.hint2)}</div>
+                        </div>
+                    `;
+                }
+                if (problem.hint3) {
+                    hintsDiv.innerHTML += `
+                        <div class="hint-item" onclick="toggleHint('hint3')">
+                            <div class="hint-title">🔒 Gợi ý 3 (Click)</div>
+                            <div class="hint-content" id="hint3-content">${formatHint(problem.hint3)}</div>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById("problem-box").style.display = "block";
+            document.getElementById("results").innerHTML = "";
+            document.getElementById("result-box").style.display = "none";
+        }
+
+        function toggleHint(hintId) {
+            const hintContent = document.getElementById(hintId + "-content");
+            hintContent.style.display = hintContent.style.display === "block" ? "none" : "block";
+        }
+
+        async function pollResult(submissionId) {
+            try {
+                const response = await fetch(`/get_result/${submissionId}`);
+                const result = await response.json();
+                
+                if (result.status === 'completed') {
+                    clearInterval(pollingInterval);
+                    document.getElementById("loading-spinner").style.display = "none";
+                    
+                    const resultBox = document.getElementById("result-box");
+                    resultBox.style.display = "block";
+                    resultBox.className = result.score >= 70 ? "success" : "error";
+                    
+                    resultBox.innerHTML = `
+                        <h3>${result.score >= 70 ? '✅ PASS' : '❌ FAIL'} - Điểm: ${result.score}/100</h3>
+                        <pre style="white-space: pre-wrap; line-height: 1.6;">${result.feedback}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error("Polling error:", error);
+            }
+        }
+
+        async function submitCode() {
+            const title = document.getElementById("problem-title").textContent.replace(">>> ", "");
+            const code = document.getElementById("code").value;
+            const language = document.querySelector('input[name="language"]:checked').value;
+
+            if (!code.trim()) {
+                alert("⚠️ NHẬP CODE TRƯỚC!");
+                return;
+            }
+
+            const spinner = document.getElementById("loading-spinner");
+            const resultBox = document.getElementById("result-box");
+            spinner.style.display = "block";
+            resultBox.style.display = "block";
+            resultBox.className = "";
+            resultBox.innerHTML = "<h3>⏳ AI ĐANG CHẤM...</h3>";
+
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("code", code);
+            formData.append("language", language);
+
+            try {
+                const response = await fetch("/submit_code", { method: "POST", body: formData });
+                const result = await response.json();
+
+                if (result.success) {
+                    currentSubmissionId = result.submission_id;
+                    pollingInterval = setInterval(() => {
+                        pollResult(currentSubmissionId);
+                    }, 2000);
+                } else {
+                    spinner.style.display = "none";
+                    resultBox.className = "error";
+                    resultBox.innerHTML = `<h3>❌ ${result.message}</h3>`;
+                }
+            } catch (error) {
+                spinner.style.display = "none";
+                resultBox.className = "error";
+                resultBox.innerHTML = `<h3>❌ LỖI: ${error.message}</h3>`;
+            }
+        }
+
+        async function visualizeCode() {
+            const code = document.getElementById("code").value;
+            const language = document.querySelector('input[name="language"]:checked').value;
+
+            if (!code.trim()) {
+                alert("⚠️ NHẬP CODE TRƯỚC!");
+                return;
+            }
+
+            const vizBox = document.getElementById("visualization-box");
+            const diagramDiv = document.getElementById("mermaid-diagram");
+            
+            vizBox.style.display = "block";
+            diagramDiv.innerHTML = "<p>⏳ Đang tạo sơ đồ...</p>";
+
+            const formData = new FormData();
+            formData.append("code", code);
+            formData.append("language", language);
+
+            try {
+                const response = await fetch("/visualize_code", { method: "POST", body: formData });
+                const result = await response.json();
+
+                if (result.success) {
+                    diagramDiv.innerHTML = "";
+                    const uniqueId = 'mermaid-' + Date.now();
+                    const preElement = document.createElement('pre');
+                    preElement.className = 'mermaid';
+                    preElement.id = uniqueId;
+                    preElement.textContent = result.mermaid;
+                    diagramDiv.appendChild(preElement);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await mermaid.run({ nodes: [document.getElementById(uniqueId)] });
+                } else {
+                    diagramDiv.innerHTML = `<p style="color: #f00;">❌ ${result.error}</p>`;
+                }
+            } catch (error) {
+                diagramDiv.innerHTML = `<p style="color: #f00;">❌ ${error.message}</p>`;
+            }
+        }
+        
+        function openAnalytics() {
+            document.getElementById('analytics-modal').style.display = 'block';
+            loadStudentList();
+        }
+        
+        function closeAnalytics() {
+            document.getElementById('analytics-modal').style.display = 'none';
+        }
+        
+        async function loadStudentList() {
+            const response = await fetch('/analytics/get_students');
+            const data = await response.json();
+            
+            if (data.success) {
+                const listDiv = document.getElementById('student-list');
+                listDiv.innerHTML = '';
+                
+                data.students.forEach(student => {
+                    const item = document.createElement('div');
+                    item.className = 'student-list-item';
+                    item.textContent = `>> ${student.name} [${student.username}]`;
+                    item.onclick = () => analyzeStudent(student.username, student.name);
+                    listDiv.appendChild(item);
+                });
+            }
+        }
+        
+        async function analyzeStudent(username, name) {
+            const resultDiv = document.getElementById('analysis-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p style="color: #ff0;">⏳ AI ĐANG PHÂN TÍCH...</p>';
+            
+            const formData = new FormData();
+            formData.append('username', username);
+            
+            try {
+                const response = await fetch('/analytics/analyze_student', { method: 'POST', body: formData });
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayAnalysis(result.data, name);
+                } else {
+                    resultDiv.innerHTML = `<p style="color: #f00;">❌ ${result.error}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: #f00;">❌ ${error.message}</p>`;
+            }
+        }
+        
+        function displayAnalysis(data, name) {
+            const resultDiv = document.getElementById('analysis-result');
+            
+            let html = `
+                <h2 style="color: #f0f;">🦠 PHÂN TÍCH: ${name}</h2>
+                <div class="stat-card">
+                    <h3>📊 TỔNG QUAN</h3>
+                    <p>Tổng bài: ${data.total_submissions || 0}</p>
+                    <p>Xu hướng: ${data.learning_trend || 'N/A'}</p>
+                    <p>Điểm TB: ${data.overall_score || 'N/A'}/100</p>
+                </div>
+            `;
+            
+            if (data.strengths && data.strengths.length > 0) {
+                html += `
+                    <div class="stat-card">
+                        <h3>💪 ĐIỂM MẠNH</h3>
+                        ${data.strengths.map(s => `<div class="strength-item">✅ ${s}</div>`).join('')}
+                    </div>
+                `;
+            }
+            
+            if (data.weaknesses && data.weaknesses.length > 0) {
+                html += `
+                    <div class="stat-card">
+                        <h3>⚠️ CẦN CẢI THIỆN</h3>
+                        ${data.weaknesses.map(w => `<div class="weakness-item">❌ ${w}</div>`).join('')}
+                    </div>
+                `;
+            }
+            
+            if (data.recommendations && data.recommendations.length > 0) {
+                html += `
+                    <div class="stat-card">
+                        <h3>💡 KHUYẾN NGHỊ</h3>
+                        ${data.recommendations.map((r, i) => `<p>${i+1}. ${r}</p>`).join('')}
+                    </div>
+                `;
+            }
+            
+            if (data.summary) {
+                html += `
+                    <div class="stat-card">
+                        <h3>📝 TÓM TẮT</h3>
+                        <p>${data.summary}</p>
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦠 CODE GRADER</h1>
+            <div class="gif-container">
+                <img src="{{ random_gif }}" alt="Coding GIF">
+            </div>
+            <div class="user-info">
+                User: {{ user }} | <a href="/logout">Đăng xuất</a>
+            </div>
+        </header>
+
+        <h3>🔎 Tìm đề bài</h3>
+        <input id="query" placeholder="Nhập tên đề..." oninput="searchProblems()">
+        <div id="results"></div>
+
+        <div id="problem-box">
+            <h3 id="problem-title"></h3>
+            <div id="problem-content"></div>
+            
+            <div id="hints-container"></div>
+            
+            <h4>💻 Nhập code:</h4>
+            <textarea id="code" placeholder="Code tại đây..."></textarea>
+
+            <label><input type="radio" name="language" value="Python" checked> Python</label>
+            <label><input type="radio" name="language" value="C++"> C++</label><br><br>
+
+            <button onclick="submitCode()">GỬI BÀI</button>
+            <button onclick="visualizeCode()">XEM SƠ ĐỒ</button>
+            
+            <div id="loading-spinner" class="spinner"></div>
+            <div id="result-box"></div>
+            
+            <div id="visualization-box" style="display: none; margin-top: 20px; border: 2px solid #0f0; padding: 15px;">
+                <h3>🧠 SƠ ĐỒ</h3>
+                <div id="mermaid-diagram"></div>
+            </div>
+        </div>
+    </div>
+    
+    <button id="analytics-btn" onclick="openAnalytics()">📊 PHÂN TÍCH</button>
+    
+    <div id="analytics-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAnalytics()">&times;</span>
+            <h2>📊 PHÂN TÍCH HỌC SINH</h2>
+            <div id="student-list"></div>
+            <div id="analysis-result"></div>
+        </div>
+    </div>
+</body>
+</html>
