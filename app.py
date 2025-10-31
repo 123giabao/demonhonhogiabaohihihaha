@@ -9,21 +9,45 @@ import os
 from openai import OpenAI
 
 app = Flask(__name__)
-app.secret_key = "secret123"
+# Đọc SECRET_KEY từ environment variable
+app.secret_key = os.environ.get('SECRET_KEY', 'secret123')
 
-# 🔑 DeepSeek API Configuration
-DEEPSEEK_API_KEY = "sk-474836e4c7b6462d8a9a24ed964b0251"
-deepseek_client = OpenAI(
-    api_key=DEEPSEEK_API_KEY,
-    base_url="https://api.deepseek.com"
-)
+# 🔑 DeepSeek API Configuration - Đọc từ environment variable
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-474836e4c7b6462d8a9a24ed964b0251')
+
+try:
+    deepseek_client = OpenAI(
+        api_key=DEEPSEEK_API_KEY,
+        base_url="https://api.deepseek.com",
+        timeout=30.0
+    )
+except Exception as e:
+    print(f"⚠️ Lỗi khởi tạo OpenAI client: {e}")
+    deepseek_client = None
 
 # 🔑 Kết nối Google Sheets
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name(
-    "./credentials.json", 
-    scope
-)
+
+# Đọc credentials từ environment variable hoặc file
+google_creds = os.environ.get('GOOGLE_CREDENTIALS')
+if google_creds:
+    # Trên Render: đọc từ environment variable
+    try:
+        creds_dict = json.loads(google_creds)
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+        print("✅ Đã load credentials từ environment variable")
+    except Exception as e:
+        print(f"❌ Lỗi load credentials từ env: {e}")
+        raise
+else:
+    # Local: đọc từ file
+    try:
+        creds = ServiceAccountCredentials.from_json_keyfile_name("./credentials.json", scope)
+        print("✅ Đã load credentials từ file local")
+    except Exception as e:
+        print(f"❌ Lỗi load credentials từ file: {e}")
+        raise
+
 client = gspread.authorize(creds)
 
 # 📄 Mở sheets
@@ -179,6 +203,16 @@ def update_analysis_to_lichsu(username, analysis_result):
 
 def grade_code_with_deepseek(student_code, correct_answer, problem_title, language):
     """Sử dụng DeepSeek để chấm code"""
+    if not deepseek_client:
+        return {
+            "score": 0,
+            "result": "ERROR",
+            "feedback": "DeepSeek API chưa được khởi tạo",
+            "strengths": [],
+            "weaknesses": ["Không thể kết nối AI"],
+            "suggestions": ["Kiểm tra API key"]
+        }
+    
     try:
         prompt = f"""Bạn là giáo viên lập trình chuyên nghiệp. Hãy chấm bài của học sinh.
 
@@ -255,6 +289,9 @@ Chấm điểm dựa trên:
 
 def analyze_student_history_with_deepseek(username):
     """Phân tích toàn bộ lịch sử học tập của học sinh bằng DeepSeek"""
+    if not deepseek_client:
+        return {"error": "DeepSeek API chưa được khởi tạo"}
+    
     try:
         # Lấy dữ liệu từ Sheet LichSuHocTap
         all_data = sheet_lichsu.get_all_values()
