@@ -333,11 +333,11 @@ Hãy trả về JSON với định dạng:
     "overall_score": <điểm trung bình 0-100>,
     "learning_trend": "<IMPROVING/STABLE/DECLINING>",
     "strengths": ["điểm mạnh 1", "điểm mạnh 2", "điểm mạnh 3"],
-    "weaknesses": ["điểm yếu 1", "điểm yếu 2"],
-    "thinking_style": "<mô tả lối tư duy>",
-    "recommendations": ["khuyến nghị 1", "khuyến nghị 2", "khuyến nghị 3"],
-    "focus_areas": ["chủ đề cần tập trung 1", "chủ đề 2"],
-    "summary": "<tóm tắt tổng quan 2-3 câu>"
+    "weaknesses": ["điểm yếu 1", "điểm yếu 2", tìm hết tất cả điểm yếu của học sinh đó luông],
+    "thinking_style": "<mô tả lối tư duy(mô tả chi tiết vô)>",
+    "recommendations": ["khuyến nghị 1", "khuyến nghị 2", "khuyến nghị 3", đưa ra nhiều khuyến nghị hữu ích quan trọng với trình độ của học sinh hiện tại],
+    "focus_areas": ["chủ đề cần tập trung 1", "chủ đề 2", nói tất cả những chủ đề học sinh cần tập trung luôn],
+    "summary": "<tóm tắt tổng quan định hướng cho học sinh đang trong trạng thái như nào và gợi ích cho học sinh cần làm gì để cải thiện >"
 }}
 
 Phân tích sâu:
@@ -676,4 +676,5 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
