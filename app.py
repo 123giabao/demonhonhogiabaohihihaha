@@ -230,12 +230,12 @@ def grade_code_with_deepseek(student_code, correct_answer, problem_title, langua
 
 Hãy phân tích và trả về JSON với định dạng:
 {{
-    "score": <điểm từ 0-100>,
+    "score": <điểm từ 0-100 kiểu trả lời theo bạn thì cách code của học sinh thì được bao nhiêu phần trăm điểm so với yêu cầu đề bài á>,
     "result": "<PASS/FAIL>",
-    "feedback": "<nhận xét tổng quan>",
+    "feedback": "<nhận xét tổng quan(nhận xét về cách code của học sinh độ phức tạp thuật toán có phù hợp với đề bài hay không và tư duy code của học sinh có đang đi lệt hướng so với yêu cầu đề bài hay không)>",
     "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
-    "weaknesses": ["điểm yếu 1", "điểm yếu 2"],
-    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2"]
+    "weaknesses": ["điểm yếu 1", "điểm yếu 2","có thể nói tất cả điểm yêu của học sinh ra luôn"],
+    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2",.., phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này]
 }}
 
 Chấm điểm dựa trên:
@@ -676,3 +676,4 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
