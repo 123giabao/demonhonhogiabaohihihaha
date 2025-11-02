@@ -251,7 +251,7 @@ Chấm điểm dựa trên:
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
-            max_tokens=2000
+            max_tokens=6000
         )
         
         result_text = response.choices[0].message.content.strip()
@@ -676,4 +676,5 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
