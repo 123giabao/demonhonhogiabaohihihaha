@@ -367,34 +367,7 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
             "weaknesses": ["Không thể chấm bài"],
             "suggestions": ["Kiểm tra API key hoặc kết nối mạng"]
         }
-```
 
----
-
-## 🔑 **Những thay đổi chính:**
-
-1. ✅ **Thêm ví dụ cụ thể** trong prompt về format mong muốn
-2. ✅ **Tăng temperature** lên 0.4 để AI viết chi tiết hơn
-3. ✅ **Tăng max_tokens** lên 8000 để đủ chỗ viết
-4. ✅ **Thêm phần format lại feedback** với emoji và cấu trúc rõ ràng
-5. ✅ **Yêu cầu AI đưa code mẫu cụ thể** trong suggestions
-
-Bây giờ kết quả sẽ đẹp kiểu này:
-```
-📊 TỔNG QUAN:
-Code của học sinh có logic đúng nhưng chưa tối ưu và thiếu xử lý edge cases.
-
-✅ ĐIỂM MẠNH:
-1. Logic thuật toán đúng, sử dụng vòng lặp hiệu quả
-2. Code dễ đọc, có cấu trúc rõ ràng
-
-❌ ĐIỂM YẾU:
-1. Chưa xử lý trường hợp input rỗng
-2. Độ phức tạp O(n²) chưa tối ưu
-
-💡 GỢI Ý CẢI THIỆN:
-1. **Xử lý edge case:** Thêm kiểm tra...
-   [code mẫu cụ thể] kiểu đưa 1 số code chính xác để gợi ý học sinh á
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -689,6 +662,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
