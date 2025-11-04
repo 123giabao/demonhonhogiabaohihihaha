@@ -171,7 +171,33 @@ def save_to_lichsu(username, submission_data):
         print(f"❌ Lỗi lưu lịch sử: {str(e)}")
         return False
 
-
+@app.route('/test_deepseek', methods=['GET'])
+def test_deepseek():
+    """Test DeepSeek API"""
+    if 'user' not in session:
+        return "Please login first"
+    
+    try:
+        response = deepseek_client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": "Return only JSON"},
+                {"role": "user", "content": 'Return this JSON: {"test": "ok", "score": 100}'}
+            ],
+            temperature=0.1,
+            max_tokens=100
+        )
+        
+        result = response.choices[0].message.content
+        
+        return f"""
+        <h2>DeepSeek Test</h2>
+        <pre>{result}</pre>
+        <hr>
+        <p>Length: {len(result)}</p>
+        """
+    except Exception as e:
+        return f"Error: {str(e)}"
 def update_analysis_to_lichsu(username, analysis_result):
     """Cập nhật kết quả phân tích vào Sheet LichSuHocTap"""
     try:
@@ -662,6 +688,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
