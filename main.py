@@ -227,6 +227,7 @@ def update_analysis_to_lichsu(username, analysis_result):
         return False
 
 
+
 def grade_code_with_deepseek(student_code, correct_answer, problem_title, language):
     """Sử dụng DeepSeek để chấm code"""
     if not deepseek_client:
@@ -239,19 +240,8 @@ def grade_code_with_deepseek(student_code, correct_answer, problem_title, langua
             "suggestions": ["Kiểm tra API key"]
         }
     
-    # Validate input
-    if not student_code or not correct_answer:
-        return {
-            "score": 0,
-            "result": "FAIL",
-            "feedback": "Thiếu code học sinh hoặc đáp án",
-            "strengths": [],
-            "weaknesses": ["Code rỗng"],
-            "suggestions": ["Hãy viết code trước khi nộp bài"]
-        }
-    
     try:
-        prompt = f"""Bạn là giáo viên lập trình chuyên nghiệp. Hãy chấm bài của học sinh một cách CHI TIẾT và DỄ HIỂU.
+        prompt = f"""Bạn là giáo viên lập trình chuyên nghiệp. Hãy chấm bài của học sinh.
 
 **Đề bài:** {problem_title}
 
@@ -265,111 +255,54 @@ def grade_code_with_deepseek(student_code, correct_answer, problem_title, langua
 {student_code}
 ```
 
-Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JSON, không thêm text nào khác):
+Hãy phân tích và trả về JSON với định dạng:
 {{
     "score": <điểm từ 0-100>,
-    "result": "PASS hoặc FAIL",
-    "feedback": "📊 TỔNG QUAN:<tóm tắt ngắn gọn 2-3 câu về code của học sinh>",
-
-    "weaknesses": [
-        "nhược điểm của code",
-        "Độ phức tạp",
-        "Thiếu xử lý edge case",
-    ],
-    "suggestions": [
-        "**Xử lý edge case:** Thêm kiểm tra đầu vào:\\n```{language}\\nif not arr or len(arr) == 0:\\n    return []\\n```",
-        "**Tối ưu thuật toán:** Trong đáp án chuẩn, có dùng <giải thích kỹ thuật cụ thể từ đáp án>. Ví dụ:\\n```{language}\\n<trích đoạn code từ đáp án chuẩn>\\n```\\nSo với code của bạn:\\n```{language}\\n<trích đoạn code học sinh>\\n```\\nĐiểm khác biệt: <giải thích>",
-    ]
+    "result": "<PASS/FAIL>",
+    "feedback": "<nhận xét tổng quan>",
+    "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
+    "weaknesses": ["điểm yếu 1", "điểm yếu 2"],
+    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2"]
 }}
 
-**YÊU CẦU CHẤM ĐIỂM:**
-- Logic đúng (40%): Thuật toán có cho kết quả đúng không?
-- Độ tối ưu (30%): Time/Space complexity có tốt không? So sánh với đáp án chuẩn
-- Xử lý edge cases (10%): Có xử lý input rỗng, null, giá trị đặc biệt không?
-
-**HƯỚNG DẪN VIẾT SUGGESTIONS (QUAN TRỌNG):**
-. So sánh trực tiếp code học sinh với đáp án chuẩn
-. Giải thích TẠI SAO nên làm như vậy
-. Đưa ra ít nhất 1-2 gợi ý chi tiết Trích dẫn đoạn code từ đáp án chuẩn để học sinh thấy rõ
-Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh và đáp án
-"""
+Chấm điểm dựa trên:
+- Logic đúng (40%)
+- Độ tối ưu (30%)
+- Clean code (20%)
+- Xử lý edge cases (10%)"""
 
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp. Trả lời CHI TIẾT, DỄ HIỂU với nhiều ví dụ code CỤ THỂ. Chỉ trả về JSON hợp lệ."},
+                {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp, trả về JSON hợp lệ."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.4,
-            max_tokens=2000,  # Tăng token để có đủ chỗ viết chi tiết
-            timeout=45.0
+            temperature=0.3,
+            max_tokens=2000
         )
         
         result_text = response.choices[0].message.content.strip()
-        
-        # Debug log
-        print(f"📝 DeepSeek response length: {len(result_text)}")
-        
-        # Parse JSON từ response
+        # khúc này dùng để lọc ra 
         if "```json" in result_text:
             result_text = result_text.split("```json")[1].split("```")[0].strip()
         elif "```" in result_text:
             result_text = result_text.split("```")[1].split("```")[0].strip()
         
         result = json.loads(result_text)
-        
-        # Validate và format lại feedback
-        required_keys = ["score", "result", "feedback", "strengths", "weaknesses", "suggestions"]
-        for key in required_keys:
-            if key not in result:
-                print(f"⚠️ Thiếu key: {key}")
-                result[key] = [] if key in ["strengths", "weaknesses", "suggestions"] else "N/A"
-        
-        # Format lại feedback cho đẹp
-        formatted_feedback = f"{result['feedback']}\n\n"
-        formatted_feedback += "✅ **ĐIỂM MẠNH:**\n"
-        for i, strength in enumerate(result['strengths'], 1):
-            formatted_feedback += f"{i}. {strength}\n"
-        
-        formatted_feedback += "\n❌ **ĐIỂM YẾU:**\n"
-        for i, weakness in enumerate(result['weaknesses'], 1):
-            formatted_feedback += f"{i}. {weakness}\n"
-        
-        formatted_feedback += "\n💡 **GỢI Ý CẢI THIỆN:**\n"
-        for i, suggestion in enumerate(result['suggestions'], 1):
-            formatted_feedback += f"{i}. {suggestion}\n\n"
-        
-        result['feedback'] = formatted_feedback
-        
-        # Ensure result is PASS or FAIL
-        if result['result'] not in ['PASS', 'FAIL']:
-            result['result'] = 'PASS' if result['score'] >= 70 else 'FAIL'
-        
         return result
         
     except json.JSONDecodeError as e:
-        print(f"❌ Lỗi parse JSON: {str(e)}")
-        print(f"📄 Response text: {result_text[:1000] if 'result_text' in locals() else 'N/A'}")
+        print(f"Lỗi parse JSON: {str(e)}")
         return {
             "score": 50,
             "result": "ERROR",
-            "feedback": "AI trả về dữ liệu không hợp lệ. Vui lòng thử lại.",
+            "feedback": "Không thể phân tích kết quả từ AI",
             "strengths": ["Code đã được gửi thành công"],
             "weaknesses": ["Hệ thống chưa phân tích được"],
-            "suggestions": ["Vui lòng thử lại sau 10 giây"]
-        }
-    except TimeoutError as e:
-        print(f"⏱️ Timeout: {str(e)}")
-        return {
-            "score": 0,
-            "result": "ERROR",
-            "feedback": "AI mất quá nhiều thời gian phản hồi",
-            "strengths": [],
-            "weaknesses": ["Timeout khi chấm bài"],
-            "suggestions": ["Code quá dài hoặc phức tạp, hãy rút gọn lại"]
+            "suggestions": ["Vui lòng thử lại"]
         }
     except Exception as e:
-        print(f"❌ Lỗi DeepSeek API: {str(e)}")
+        print(f"Lỗi DeepSeek API: {str(e)}")
         return {
             "score": 0,
             "result": "ERROR",
@@ -378,6 +311,8 @@ Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh 
             "weaknesses": ["Không thể chấm bài"],
             "suggestions": ["Kiểm tra API key hoặc kết nối mạng"]
         }
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -673,6 +608,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
