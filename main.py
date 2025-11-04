@@ -289,8 +289,8 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
                 {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp. Trả lời CHI TIẾT, DỄ HIỂU với nhiều ví dụ code CỤ THỂ. Chỉ trả về JSON hợp lệ."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.4,  # Tăng lên 0.4 để có câu trả lời chi tiết hơn
-            max_tokens=8000,  # Tăng token để có đủ chỗ viết chi tiết
+            temperature=0.4,
+            max_tokens=5000,  # Tăng token để có đủ chỗ viết chi tiết
             timeout=45.0
         )
         
@@ -662,6 +662,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
