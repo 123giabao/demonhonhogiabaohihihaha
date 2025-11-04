@@ -269,38 +269,32 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
 {{
     "score": <điểm từ 0-100>,
     "result": "PASS hoặc FAIL",
-    "feedback": "📊 TỔNG QUAN:\\n<tóm tắt ngắn gọn 2-3 câu về code của học sinh>",
+    "feedback": "📊 TỔNG QUAN:<tóm tắt ngắn gọn 2-3 câu về code của học sinh>",
     "strengths": [
-        "Logic thuật toán đúng, sử dụng vòng lặp hiệu quả",
-        "Code dễ đọc, có cấu trúc rõ ràng",
-        "Xử lý tốt các trường hợp cơ bản"
+        "Logic thuật toán",
+        "các trường hợp cơ bản"
     ],
     "weaknesses": [
-        "Chưa xử lý trường hợp input rỗng hoặc null",
-        "Độ phức tạp O(n²) chưa tối ưu, có thể cải thiện thành O(n)",
-        "Thiếu xử lý edge case khi mảng có 1 phần tử",
-        "Không kiểm tra kiểu dữ liệu đầu vào"
+        "nhược điểm của code",
+        "Độ phức tạp",
+        "Thiếu xử lý edge case",
     ],
     "suggestions": [
         "**Xử lý edge case:** Thêm kiểm tra đầu vào:\\n```{language}\\nif not arr or len(arr) == 0:\\n    return []\\n```",
         "**Tối ưu thuật toán:** Trong đáp án chuẩn, có dùng <giải thích kỹ thuật cụ thể từ đáp án>. Ví dụ:\\n```{language}\\n<trích đoạn code từ đáp án chuẩn>\\n```\\nSo với code của bạn:\\n```{language}\\n<trích đoạn code học sinh>\\n```\\nĐiểm khác biệt: <giải thích>",
-        "**Cải thiện performance:** Thay vì dùng list, hãy dùng set để tìm kiếm nhanh hơn (O(1) thay vì O(n))",
-        "**Best practice:** Thêm docstring và type hints để code chuyên nghiệp hơn"
     ]
 }}
 
 **YÊU CẦU CHẤM ĐIỂM:**
 - Logic đúng (40%): Thuật toán có cho kết quả đúng không?
 - Độ tối ưu (30%): Time/Space complexity có tốt không? So sánh với đáp án chuẩn
-- Clean code (20%): Dễ đọc, có comment, đặt tên biến rõ ràng
 - Xử lý edge cases (10%): Có xử lý input rỗng, null, giá trị đặc biệt không?
 
 **HƯỚNG DẪN VIẾT SUGGESTIONS (QUAN TRỌNG):**
-1. Mỗi suggestion phải có ví dụ code CỤ THỂ
-2. So sánh trực tiếp code học sinh với đáp án chuẩn
-3. Giải thích TẠI SAO nên làm như vậy
-4. Đưa ra ít nhất 4-5 gợi ý chi tiết
-5. Trích dẫn đoạn code từ đáp án chuẩn để học sinh thấy rõ
+. So sánh trực tiếp code học sinh với đáp án chuẩn
+. Giải thích TẠI SAO nên làm như vậy
+. Đưa ra ít nhất 1-2 gợi ý chi tiết Trích dẫn đoạn code từ đáp án chuẩn để học sinh thấy rõ
+
 
 **LƯU Ý:**
 - Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh và đáp án
@@ -316,7 +310,7 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
                 {"role": "user", "content": prompt}
             ],
             temperature=0.4,
-            max_tokens=5000,  # Tăng token để có đủ chỗ viết chi tiết
+            max_tokens=9000,  # Tăng token để có đủ chỗ viết chi tiết
             timeout=45.0
         )
         
@@ -688,6 +682,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
