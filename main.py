@@ -232,17 +232,23 @@ Hãy phân tích và trả về JSON với định dạng:
 {{
     "score": <điểm từ 0-100 kiểu trả lời theo bạn thì cách code của học sinh thì được bao nhiêu phần trăm điểm so với yêu cầu đề bài á>,
     "result": "<PASS/FAIL>",
-    "feedback": "<nhận xét tổng quan(nhận xét về cách code của học sinh độ phức tạp thuật toán có phù hợp với đề bài hay không và tư duy code của học sinh có đang đi lệt hướng so với yêu cầu đề bài hay không)>",
+    "feedback": "<nhận xét tổng quan>",
     "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
-    "weaknesses": ["điểm yếu 1", "điểm yếu 2","có thể nói tất cả điểm yêu của học sinh ra luôn"],
-    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2",.., phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này]
+    "weaknesses": ["điểm yếu 1", "điểm yếu 2","nói thêm nhiều điểm yếu nếu có"],
+    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2", "phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này"]
 }}
 
 Chấm điểm dựa trên:
 - Logic đúng (40%)
 - Độ tối ưu (30%)
 - Clean code (20%)
-- Xử lý edge cases (10%)"""
+- Xử lý edge cases (10%)
+phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này
+
+có thể nói tất cả điểm yêu của học sinh ra luôn
+
+nhận xét về cách code của học sinh độ phức tạp thuật toán có phù hợp với đề bài hay không và tư duy code của học sinh có đang đi lệt hướng so với yêu cầu đề bài hay không
+"""
 
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
@@ -335,8 +341,8 @@ Hãy trả về JSON với định dạng:
     "strengths": ["điểm mạnh 1", "điểm mạnh 2", "điểm mạnh 3"],
     "weaknesses": ["điểm yếu 1", "điểm yếu 2", tìm hết tất cả điểm yếu của học sinh đó luông],
     "thinking_style": "<mô tả lối tư duy(mô tả chi tiết vô)>",
-    "recommendations": ["khuyến nghị 1", "khuyến nghị 2", "khuyến nghị 3", đưa ra nhiều khuyến nghị hữu ích quan trọng với trình độ của học sinh hiện tại],
-    "focus_areas": ["chủ đề cần tập trung 1", "chủ đề 2", nói tất cả những chủ đề học sinh cần tập trung luôn],
+    "recommendations": ["khuyến nghị 1", "khuyến nghị 2", "khuyến nghị 3", "đưa ra nhiều khuyến nghị hữu ích quan trọng với trình độ của học sinh hiện tại"],
+    "focus_areas": ["chủ đề cần tập trung 1", "chủ đề 2", "nói tất cả những chủ đề học sinh cần tập trung luôn"],
     "summary": "<tóm tắt tổng quan định hướng cho học sinh đang trong trạng thái như nào và gợi ích cho học sinh cần làm gì để cải thiện >"
 }}
 
@@ -676,5 +682,6 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
