@@ -265,15 +265,18 @@ Lưu ý:
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Bạn là giáo viên lập trình. trả về JSON hợp lệ"},
+                {"role": "system", "content": "Bạn là giáo viên lập trình. Chỉ trả về JSON hợp lệ, không thêm text nào khác."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.4,
+            temperature=0.3,
             max_tokens=6000,
-            response_format={"type": "json_object"}  # Bắt buộc trả về JSON
+            timeout=45.0  # Tăng timeout lên 45s
         )
         
         result_text = response.choices[0].message.content.strip()
+        
+        # Debug log
+        print(f"📝 DeepSeek response length: {len(result_text)}")
         
         # Parse JSON từ response
         if "```json" in result_text:
@@ -285,21 +288,37 @@ Lưu ý:
         
         # Validate kết quả
         required_keys = ["score", "result", "feedback", "strengths", "weaknesses", "suggestions"]
-        if not all(key in result for key in required_keys):
-            raise ValueError("JSON thiếu trường bắt buộc")
+        for key in required_keys:
+            if key not in result:
+                print(f"⚠️ Thiếu key: {key}")
+                result[key] = [] if key in ["strengths", "weaknesses", "suggestions"] else "N/A"
+        
+        # Ensure result is PASS or FAIL
+        if result['result'] not in ['PASS', 'FAIL']:
+            result['result'] = 'PASS' if result['score'] >= 70 else 'FAIL'
         
         return result
         
     except json.JSONDecodeError as e:
         print(f"❌ Lỗi parse JSON: {str(e)}")
-        print(f"Response text: {result_text[:500]}")  # Debug
+        print(f"📄 Response text: {result_text[:1000] if 'result_text' in locals() else 'N/A'}")
         return {
             "score": 50,
             "result": "ERROR",
-            "feedback": "Không thể phân tích kết quả từ AI",
+            "feedback": "AI trả về dữ liệu không hợp lệ. Vui lòng thử lại.",
             "strengths": ["Code đã được gửi thành công"],
             "weaknesses": ["Hệ thống chưa phân tích được"],
-            "suggestions": ["Vui lòng thử lại"]
+            "suggestions": ["Vui lòng thử lại sau 10 giây"]
+        }
+    except TimeoutError as e:
+        print(f"⏱️ Timeout: {str(e)}")
+        return {
+            "score": 0,
+            "result": "ERROR",
+            "feedback": "AI mất quá nhiều thời gian phản hồi",
+            "strengths": [],
+            "weaknesses": ["Timeout khi chấm bài"],
+            "suggestions": ["Code quá dài hoặc phức tạp, hãy rút gọn lại"]
         }
     except Exception as e:
         print(f"❌ Lỗi DeepSeek API: {str(e)}")
@@ -311,102 +330,6 @@ Lưu ý:
             "weaknesses": ["Không thể chấm bài"],
             "suggestions": ["Kiểm tra API key hoặc kết nối mạng"]
         }
-
-
-def analyze_student_history_with_deepseek(username):
-    """Phân tích toàn bộ lịch sử học tập của học sinh bằng DeepSeek"""
-    if not deepseek_client:
-        return {"error": "DeepSeek API chưa được khởi tạo"}
-    
-    try:
-        # Lấy dữ liệu từ Sheet LichSuHocTap
-        all_data = sheet_lichsu.get_all_values()
-        user_data = None
-        
-        for row in all_data[1:]:
-            if row[0] == username:
-                user_data = row
-                break
-        
-        if not user_data or not user_data[4]:  # Kiểm tra có code không
-            return {
-                "error": "Học sinh chưa có bài làm nào",
-                "total_submissions": 0
-            }
-        
-        # Parse dữ liệu
-        recent_problems = user_data[5].split(" ||| ") if len(user_data) > 5 else []
-        recent_scores = user_data[6].split(", ") if len(user_data) > 6 else []
-        recent_feedbacks = user_data[7].split(" ||| ") if len(user_data) > 7 else []
-        
-        # Tạo summary
-        submission_summary = "\n\n".join([
-            f"""Bài {i+1}: {recent_problems[i] if i < len(recent_problems) else 'N/A'}
-Điểm: {recent_scores[i] if i < len(recent_scores) else 'N/A'}
-Feedback: {recent_feedbacks[i] if i < len(recent_feedbacks) else 'N/A'}"""
-            for i in range(min(len(recent_problems), 10))
-        ])
-        
-        prompt = f"""Bạn là chuyên gia phân tích giáo dục. Hãy phân tích toàn diện học sinh **{username}**.
-
-**Lịch sử làm bài (tổng {user_data[1]} bài):**
-**Điểm trung bình: {user_data[2]}**
-
-{submission_summary}
-
-Hãy trả về JSON với định dạng:
-{{
-    "overall_score": <điểm trung bình 0-100>,
-    "learning_trend": "<IMPROVING/STABLE/DECLINING>",
-    "strengths": ["điểm mạnh 1", "điểm mạnh 2", "điểm mạnh 3"],
-    "weaknesses": ["điểm yếu 1", "điểm yếu 2", tìm hết tất cả điểm yếu của học sinh đó luông],
-    "thinking_style": "<mô tả lối tư duy(mô tả chi tiết vô)>",
-    "recommendations": ["khuyến nghị 1", "khuyến nghị 2", "khuyến nghị 3", "đưa ra nhiều khuyến nghị hữu ích quan trọng với trình độ của học sinh hiện tại"],
-    "focus_areas": ["chủ đề cần tập trung 1", "chủ đề 2", "nói tất cả những chủ đề học sinh cần tập trung luôn"],
-    "summary": "<tóm tắt tổng quan định hướng cho học sinh đang trong trạng thái như nào và gợi ích cho học sinh cần làm gì để cải thiện >"
-}}
-
-Phân tích sâu:
-- Xu hướng tiến bộ theo thời gian
-- Phong cách code (clean code, tối ưu, xử lý lỗi...)
-- Khả năng logic và thuật toán
-- Điểm cần cải thiện ưu tiên
-- Luôn nói xin chào"""
-
-        response = deepseek_client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "system", "content": "Bạn là chuyên gia phân tích giáo dục, trả về JSON hợp lệ."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4,
-            max_tokens=2500
-        )
-        
-        result_text = response.choices[0].message.content.strip()
-        
-        # Parse JSON
-        if "```json" in result_text:
-            result_text = result_text.split("```json")[1].split("```")[0].strip()
-        elif "```" in result_text:
-            result_text = result_text.split("```")[1].split("```")[0].strip()
-        
-        result = json.loads(result_text)
-        result['total_submissions'] = int(user_data[1]) if user_data[1] else 0
-        result['recent_scores'] = recent_scores[:5]
-        
-        # Lưu kết quả phân tích vào Sheet
-        update_analysis_to_lichsu(username, result)
-        
-        return result
-        
-    except json.JSONDecodeError as e:
-        print(f"❌ Lỗi parse JSON: {str(e)}")
-        return {"error": "Không thể phân tích dữ liệu"}
-    except Exception as e:
-        print(f"❌ Lỗi phân tích: {str(e)}")
-        return {"error": str(e)}
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -702,6 +625,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
