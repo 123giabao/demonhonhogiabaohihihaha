@@ -232,7 +232,7 @@ Hãy phân tích và trả về JSON với định dạng:
 {{
     "score": <điểm từ 0-100 kiểu trả lời theo bạn thì cách code của học sinh thì được bao nhiêu phần trăm điểm so với yêu cầu đề bài á>,
     "result": "<PASS/FAIL>",
-    "feedback": "<nhận xét tổng quan, trả lời tại sao lại có kết quả như thế so với đề và dùng 1 vào dự liệu trong code chính xác để cho học sinh thấy và gợi ý con đường code >",
+    "feedback": ["nhận xét tổng quan", "trả lời tại sao lại có kết quả như thế so với đề và dùng 1 vào dự liệu trong code chính xác để cho học sinh thấy và gợi ý con đường code"],
     "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
     "weaknesses": ["điểm yếu 1", "điểm yếu 2","nói thêm nhiều điểm yếu nếu có", "chú ý nói về trường hợp biên của code học sinh so với với code chính xác"],
     "suggestions": ["gợi ý cải thiện 1", "dựa vào code chính xác để đưa ra gợi ý là các câu lệnh trong code chính xác cho học sinh thấy", "phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này"]
@@ -243,17 +243,17 @@ Chấm điểm dựa trên:
 - Độ tối ưu (30%)
 - Clean code (20%)
 - Xử lý edge cases (10%)
-phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này
+- phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này
 
-có thể nói tất cả điểm yêu của học sinh ra luôn
+- có thể nói tất cả điểm yêu của học sinh ra luôn
 
-nhận xét về cách code của học sinh độ phức tạp thuật toán có phù hợp với đề bài hay không và tư duy code của học sinh có đang đi lệt hướng so với yêu cầu đề bài hay không
+- nhận xét về cách code của học sinh độ phức tạp thuật toán có phù hợp với đề bài hay không và tư duy code của học sinh có đang đi lệt hướng so với yêu cầu đề bài hay không
 """
 
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp, trả về JSON hợp lệ."},
+                {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp, trả về kế quả dạng văn bản hợp lệ."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
@@ -682,6 +682,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
