@@ -301,7 +301,7 @@ Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh 
                 {"role": "user", "content": prompt}
             ],
             temperature=0.4,
-            max_tokens=4000,  # Tăng token để có đủ chỗ viết chi tiết
+            max_tokens=2000,  # Tăng token để có đủ chỗ viết chi tiết
             timeout=45.0
         )
         
@@ -673,6 +673,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
