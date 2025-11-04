@@ -235,7 +235,7 @@ Hãy phân tích và trả về JSON với định dạng:
     "feedback": "<nhận xét tổng quan, trả lời tại sao lại có kết quả như thế so với đề và dùng 1 vào dự liệu trong code chính xác để cho học sinh thấy và gợi ý con đường code >",
     "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
     "weaknesses": ["điểm yếu 1", "điểm yếu 2","nói thêm nhiều điểm yếu nếu có", "chú ý nói về trường hợp biên của code học sinh so với với code chính xác"],
-    "suggestions": ["gợi ý cải thiện 1", "gợi ý 2", "phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này"]
+    "suggestions": ["gợi ý cải thiện 1", "dựa vào code chính xác để đưa ra gợi ý là các câu lệnh trong code chính xác cho học sinh thấy", "phần này đi theo hướng giải thích chi tiết theo từng giai đoạn nhỏ để giúp học sinh đi từng bước hiểu rõ bản thân nên cần làm gì để giải được bài toán này"]
 }}
 
 Chấm điểm dựa trên:
@@ -682,6 +682,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
