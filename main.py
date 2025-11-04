@@ -225,7 +225,7 @@ def grade_code_with_deepseek(student_code, correct_answer, problem_title, langua
         }
     
     try:
-        prompt = f"""Bạn là giáo viên lập trình chuyên nghiệp. Hãy chấm bài của học sinh.
+        prompt = f"""Bạn là giáo viên lập trình chuyên nghiệp. Hãy chấm bài của học sinh một cách CHI TIẾT và DỄ HIỂU.
 
 **Đề bài:** {problem_title}
 
@@ -239,38 +239,59 @@ def grade_code_with_deepseek(student_code, correct_answer, problem_title, langua
 {student_code}
 ```
 
-**Yêu cầu chấm điểm:**
-- Logic đúng (40%): Thuật toán có đúng không?
-- Độ tối ưu (30%): Time/Space complexity có tốt không?
-- Clean code (20%): Code có dễ đọc, có comment không?
-- Xử lý edge cases (10%): Có xử lý trường hợp đặc biệt không?
-
-Hãy phân tích chi tiết và trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JSON, không thêm text nào khác):
+Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JSON, không thêm text nào khác):
 {{
     "score": <điểm từ 0-100>,
     "result": "PASS hoặc FAIL",
-    "feedback": "Nhận xét tổng quan về code của học sinh, so sánh với đáp án chuẩn",
-    "strengths": ["điểm mạnh 1", "điểm mạnh 2"],
-    "weaknesses": ["điểm yếu 1", "điểm yếu 2", "các vấn đề về edge cases nếu có"],
-    "suggestions": ["Gợi ý cải thiện cụ thể bước 1", "Gợi ý bước 2 với code mẫu", "Giải thích từng bước để học sinh hiểu"]
+    "feedback": "📊 TỔNG QUAN:\\n<tóm tắt ngắn gọn 2-3 câu về code của học sinh>",
+    "strengths": [
+        "Logic thuật toán đúng, sử dụng vòng lặp hiệu quả",
+        "Code dễ đọc, có cấu trúc rõ ràng",
+        "Xử lý tốt các trường hợp cơ bản"
+    ],
+    "weaknesses": [
+        "Chưa xử lý trường hợp input rỗng hoặc null",
+        "Độ phức tạp O(n²) chưa tối ưu, có thể cải thiện thành O(n)",
+        "Thiếu xử lý edge case khi mảng có 1 phần tử",
+        "Không kiểm tra kiểu dữ liệu đầu vào"
+    ],
+    "suggestions": [
+        "**Xử lý edge case:** Thêm kiểm tra đầu vào:\\n```{language}\\nif not arr or len(arr) == 0:\\n    return []\\n```",
+        "**Tối ưu thuật toán:** Trong đáp án chuẩn, có dùng <giải thích kỹ thuật cụ thể từ đáp án>. Ví dụ:\\n```{language}\\n<trích đoạn code từ đáp án chuẩn>\\n```\\nSo với code của bạn:\\n```{language}\\n<trích đoạn code học sinh>\\n```\\nĐiểm khác biệt: <giải thích>",
+        "**Cải thiện performance:** Thay vì dùng list, hãy dùng set để tìm kiếm nhanh hơn (O(1) thay vì O(n))",
+        "**Best practice:** Thêm docstring và type hints để code chuyên nghiệp hơn"
+    ]
 }}
 
-Lưu ý:
-- So sánh độ phức tạp thuật toán của học sinh với đáp án
-- Chỉ ra các trường hợp biên mà code học sinh chưa xử lý
-- Đưa ra gợi ý cụ thể dựa trên đáp án chuẩn
-- Giải thích chi tiết để học sinh hiểu được hướng giải quyết đúng
+**YÊU CẦU CHẤM ĐIỂM:**
+- Logic đúng (40%): Thuật toán có cho kết quả đúng không?
+- Độ tối ưu (30%): Time/Space complexity có tốt không? So sánh với đáp án chuẩn
+- Clean code (20%): Dễ đọc, có comment, đặt tên biến rõ ràng
+- Xử lý edge cases (10%): Có xử lý input rỗng, null, giá trị đặc biệt không?
+
+**HƯỚNG DẪN VIẾT SUGGESTIONS (QUAN TRỌNG):**
+1. Mỗi suggestion phải có ví dụ code CỤ THỂ
+2. So sánh trực tiếp code học sinh với đáp án chuẩn
+3. Giải thích TẠI SAO nên làm như vậy
+4. Đưa ra ít nhất 4-5 gợi ý chi tiết
+5. Trích dẫn đoạn code từ đáp án chuẩn để học sinh thấy rõ
+
+**LƯU Ý:**
+- Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh và đáp án
+- Liệt kê HẾT các edge case mà học sinh chưa xử lý
+- Đưa suggestions phải có code mẫu CỤ THỂ, không được chung chung
+- Giải thích TỪNG BƯỚC cải thiện để học sinh hiểu rõ
 """
 
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Bạn là giáo viên lập trình. Chỉ trả về JSON hợp lệ, không thêm text nào khác."},
+                {"role": "system", "content": "Bạn là giáo viên lập trình chuyên nghiệp. Trả lời CHI TIẾT, DỄ HIỂU với nhiều ví dụ code CỤ THỂ. Chỉ trả về JSON hợp lệ."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
-            max_tokens=6000,
-            timeout=45.0  # Tăng timeout lên 45s
+            temperature=0.4,  # Tăng lên 0.4 để có câu trả lời chi tiết hơn
+            max_tokens=8000,  # Tăng token để có đủ chỗ viết chi tiết
+            timeout=45.0
         )
         
         result_text = response.choices[0].message.content.strip()
@@ -286,12 +307,28 @@ Lưu ý:
         
         result = json.loads(result_text)
         
-        # Validate kết quả
+        # Validate và format lại feedback
         required_keys = ["score", "result", "feedback", "strengths", "weaknesses", "suggestions"]
         for key in required_keys:
             if key not in result:
                 print(f"⚠️ Thiếu key: {key}")
                 result[key] = [] if key in ["strengths", "weaknesses", "suggestions"] else "N/A"
+        
+        # Format lại feedback cho đẹp
+        formatted_feedback = f"{result['feedback']}\n\n"
+        formatted_feedback += "✅ **ĐIỂM MẠNH:**\n"
+        for i, strength in enumerate(result['strengths'], 1):
+            formatted_feedback += f"{i}. {strength}\n"
+        
+        formatted_feedback += "\n❌ **ĐIỂM YẾU:**\n"
+        for i, weakness in enumerate(result['weaknesses'], 1):
+            formatted_feedback += f"{i}. {weakness}\n"
+        
+        formatted_feedback += "\n💡 **GỢI Ý CẢI THIỆN:**\n"
+        for i, suggestion in enumerate(result['suggestions'], 1):
+            formatted_feedback += f"{i}. {suggestion}\n\n"
+        
+        result['feedback'] = formatted_feedback
         
         # Ensure result is PASS or FAIL
         if result['result'] not in ['PASS', 'FAIL']:
@@ -330,7 +367,34 @@ Lưu ý:
             "weaknesses": ["Không thể chấm bài"],
             "suggestions": ["Kiểm tra API key hoặc kết nối mạng"]
         }
+```
 
+---
+
+## 🔑 **Những thay đổi chính:**
+
+1. ✅ **Thêm ví dụ cụ thể** trong prompt về format mong muốn
+2. ✅ **Tăng temperature** lên 0.4 để AI viết chi tiết hơn
+3. ✅ **Tăng max_tokens** lên 8000 để đủ chỗ viết
+4. ✅ **Thêm phần format lại feedback** với emoji và cấu trúc rõ ràng
+5. ✅ **Yêu cầu AI đưa code mẫu cụ thể** trong suggestions
+
+Bây giờ kết quả sẽ đẹp kiểu này:
+```
+📊 TỔNG QUAN:
+Code của học sinh có logic đúng nhưng chưa tối ưu và thiếu xử lý edge cases.
+
+✅ ĐIỂM MẠNH:
+1. Logic thuật toán đúng, sử dụng vòng lặp hiệu quả
+2. Code dễ đọc, có cấu trúc rõ ràng
+
+❌ ĐIỂM YẾU:
+1. Chưa xử lý trường hợp input rỗng
+2. Độ phức tạp O(n²) chưa tối ưu
+
+💡 GỢI Ý CẢI THIỆN:
+1. **Xử lý edge case:** Thêm kiểm tra...
+   [code mẫu cụ thể] kiểu đưa 1 số code chính xác để gợi ý học sinh á
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -625,6 +689,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
