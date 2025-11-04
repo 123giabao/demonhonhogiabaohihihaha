@@ -270,10 +270,7 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
     "score": <điểm từ 0-100>,
     "result": "PASS hoặc FAIL",
     "feedback": "📊 TỔNG QUAN:<tóm tắt ngắn gọn 2-3 câu về code của học sinh>",
-    "strengths": [
-        "Logic thuật toán",
-        "các trường hợp cơ bản"
-    ],
+
     "weaknesses": [
         "nhược điểm của code",
         "Độ phức tạp",
@@ -294,13 +291,7 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
 . So sánh trực tiếp code học sinh với đáp án chuẩn
 . Giải thích TẠI SAO nên làm như vậy
 . Đưa ra ít nhất 1-2 gợi ý chi tiết Trích dẫn đoạn code từ đáp án chuẩn để học sinh thấy rõ
-
-
-**LƯU Ý:**
-- Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh và đáp án
-- Liệt kê HẾT các edge case mà học sinh chưa xử lý
-- Đưa suggestions phải có code mẫu CỤ THỂ, không được chung chung
-- Giải thích TỪNG BƯỚC cải thiện để học sinh hiểu rõ
+Phải so sánh độ phức tạp thuật toán (Big O) giữa code học sinh và đáp án
 """
 
         response = deepseek_client.chat.completions.create(
@@ -310,7 +301,7 @@ Hãy trả về JSON với định dạng SAU (QUAN TRỌNG: chỉ trả về JS
                 {"role": "user", "content": prompt}
             ],
             temperature=0.4,
-            max_tokens=5000,  # Tăng token để có đủ chỗ viết chi tiết
+            max_tokens=4000,  # Tăng token để có đủ chỗ viết chi tiết
             timeout=45.0
         )
         
@@ -682,6 +673,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
