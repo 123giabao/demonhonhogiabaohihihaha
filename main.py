@@ -265,10 +265,10 @@ Lưu ý:
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Bạn là giáo viên lập trình. Chỉ trả về JSON hợp lệ, không thêm text nào khác."},
+                {"role": "system", "content": "Bạn là giáo viên lập trình. trả về JSON hợp lệ"},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.3,
+            temperature=0.4,
             max_tokens=6000,
             response_format={"type": "json_object"}  # Bắt buộc trả về JSON
         )
@@ -702,6 +702,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
 
 
 
